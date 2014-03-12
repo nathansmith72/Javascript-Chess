@@ -14,9 +14,8 @@ To do:
 **      8. Create A.I. opponents of different difficulty levels
 **      9. create database storing system for records and stats vs different A.I. levels
 **      10. create multi-player functionality
-**      11. rename deletedPieceX, deletedPieceY, and deletedPieceType
-**      12. program valid move rules for the queen and king
-**      13. rewrite isMoveAllowed() to be less redundant and more streamlined
-**      14. add chat functionality
+**      11. program valid move rules for the queen and king
+**      12. rewrite isMoveAllowed() to be less redundant and more streamlined
+**      13. add chat functionality
 
 To run the program just copy all the files to a folder and open webpage.html in any web browser.
