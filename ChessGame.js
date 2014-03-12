@@ -1,18 +1,21 @@
 /*
 ** Author : Nathan Smith
 ** Title  : ChessGame
-** ToDo   : 1. Reorganize code in a more readable way
-** 			2. create a turn based system so that white must go first, then black, and so on.
-**			3. Add the row and column rank symbols to the sides of the board
-**			4. create a restart button that will reset the board
-**          5. Improve the artwork
-**			6. Create a move list and embed it in a scroll pane
-**			7. Create a timer
-**			8. Create an A.I. opponents of different difficulty levels
-**			9. create database storing of records and stats vs different A.I. levels
-**			10. create multi-player functionality
-**			11. rename deletedPieceX, deletedPieceY, and deletedPieceType
-**			12. program valid move rules for the queen and king
+** ToDo   : 
+**      1. Reorganize code in a more readable way
+**      2. create a turn based system so that white must go first, then black, and so on.
+**      3. Add the row and column rank symbols to the sides of the board
+**      4. create a restart button that will reset the board
+**      5. Improve the artwork
+**      6. Create a move list and embed it in a scroll pane
+**      7. Create a timer
+**      8. Create A.I. opponents of different difficulty levels
+**      9. create database storing system for records and stats vs different A.I. levels
+**      10. create multi-player functionality
+**      11. rename deletedPieceX, deletedPieceY, and deletedPieceType
+**      12. program valid move rules for the queen and king
+**      13. rewrite isMoveAllowed() to be less redundant and more streamlined
+**      14. add chat functionality
 */
 
 ////////////////////////////////////////
@@ -305,7 +308,7 @@
 	/* 
 	** this function draws the board by adding the array indexes together
 	** and if they are divisible evenly by 2(meaning they add up to an even
-	** number) then a darkSquare is drawn at that location. Otherwise a dark
+	** number) then a darkSquare is drawn at that location. Otherwise a light
 	** square is drawn. 0 is considered an even number by this algorithm
 	*/
 	function drawBoard(){
