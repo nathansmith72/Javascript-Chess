@@ -12,7 +12,7 @@
 **      8. Create A.I. opponents of different difficulty levels
 **      9. create database storing system for records and stats vs different A.I. levels
 **      10. create multi-player functionality
-**      11. rename deletedPieceX, deletedPieceY, and deletedPieceType
+**      11. rename selectedPieceX, selectedPieceY, and selectedPieceType
 **      12. program valid move rules for the queen and king
 **      13. rewrite isMoveAllowed() to be less redundant and more streamlined
 **      14. add chat functionality
@@ -35,9 +35,9 @@
 	** I would like to rename them to selectedPieceX, selectedPieceY, and selectedPieceType
 	** in the near future
 	*/
-	var deletedPieceX = null;
-	var deletedPieceY = null;
-	var deletedPieceType = null;
+	var selectedPieceX = null;
+	var selectedPieceY = null;
+	var selectedPieceType = null;
 	
 	var enPassantCaptureX = -1;
 	var enPassantcaptureY = -1;
@@ -185,10 +185,10 @@
 			** names are changed in a later version
 			*/
 			pieceInHand = 1;
-			deletedPieceX = xSquare;
-			deletedPieceY = ySquare;
-			deletedPieceType = boardArray[xSquare][ySquare]
-			pieceInHandType = deletedPieceType;
+			selectedPieceX = xSquare;
+			selectedPieceY = ySquare;
+			selectedPieceType = boardArray[xSquare][ySquare]
+			pieceInHandType = selectedPieceType;
 			
 			/* 
 			** We change the boardArray variable to 0 so the piece 
@@ -224,15 +224,15 @@
 		if(pieceInHand == 1){
 		
 			/*
-			** If the move is not allowed then this black of code
+			** If the move is not allowed then this block of code
 			** will handle updating the board.
 			*/
 			if(isMoveAllowed(xSquare, ySquare) == 0){
 				console.log("move not allowed");
-				boardArray[deletedPieceX][deletedPieceY] = deletedPieceType;
-				deletedPieceX = null;
-				deletedPieceY = null;
-				deletedPieceType = null;
+				boardArray[selectedPieceX][selectedPieceY] = selectedPieceType;
+				selectedPieceX = null;
+				selectedPieceY = null;
+				selectedPieceType = null;
 				
 			/*
 			** If the move is allowed then this block of code
@@ -240,10 +240,11 @@
 			*/
 			} else if(isMoveAllowed(xSquare, ySquare) == 1){
 				console.log("move Allowed");
-				boardArray[xSquare][ySquare] = deletedPieceType;
-				deletedPieceX = null;
-				deletedPieceY = null;
-				deletedPieceType = null;
+				boardArray[xSquare][ySquare] = selectedPieceType;
+				selectedPieceX = null;
+				selectedPieceY = null;
+				selectedPieceType = null;
+				currentMove += 1;
 			}
 			
 			/*
@@ -322,6 +323,7 @@
 			}
 		}
 	}
+	
 	/*
 	**	This function simply draws a piece at a certain x and y co-ordinate.
 	**  it takes in the x and y positions and the piece type as parameters
@@ -474,27 +476,33 @@
 	}
 	
 	function isMoveAllowed(x, y){
-		switch(deletedPieceType){
+		switch(selectedPieceType){
 		case 1: //  handles valid move logic for white pawns
 		
+			//return 0 if it is not whites turn
+			if(currentMove % 2 == 0){
+				console.log("not whites turn");
+				return 0;
+			}
+			
 			//make sure player doesn't take his own piece
 			if(isWhitePiece(x,y) == 1){
 				return 0;
 			}
 			
 			//this code handles moving a pawn 2 spaces from its start point
-			if(y+2 == 6 && x == deletedPieceX && boardArray[x][y] == 0 && boardArray[x][y+1] == 0){
+			if(y+2 == 6 && x == selectedPieceX && boardArray[x][y] == 0 && boardArray[x][y+1] == 0){
 				enPassantCaptureX = x;		//en passant variables stored incase of capture
 				enPassantCaptureY = y+1;	//en passant variables stored incase of capture
 				return 1;
 			}
 			//this code handles 1 square forward moves
-			else if (y+1 == deletedPieceY && x == deletedPieceX && boardArray[x][y] == 0){
+			else if (y+1 == selectedPieceY && x == selectedPieceX && boardArray[x][y] == 0){
 				return 1;
 				
 			//this code handles capturing forward and to the left or right
-			} else if (y + 1 == deletedPieceY && boardArray[x][y] != 0){
-				if(x == deletedPieceX + 1 || x == deletedPieceX-1){
+			} else if (y + 1 == selectedPieceY && boardArray[x][y] != 0){
+				if(x == selectedPieceX + 1 || x == selectedPieceX-1){
 					return 1;
 				} else {
 					return 0;
@@ -502,8 +510,8 @@
 			}	
 			
 			//this code handles en passant capturing
-			else if (y + 1 == deletedPieceY && x == enPassantCaptureX && y == enPassantCaptureY){
-				if(x == deletedPieceX+1 || x == deletedPieceX -1){
+			else if (y + 1 == selectedPieceY && x == enPassantCaptureX && y == enPassantCaptureY){
+				if(x == selectedPieceX+1 || x == selectedPieceX -1){
 					boardArray[x][y+1] = 0;
 					return 1;
 				} else {
@@ -517,25 +525,32 @@
 			}
 		case 2: //handles valid move logic for white knights
 			//make sure player doesn't take his own piece
+			
+			//return 0 if it is not whites turn
+			if(currentMove % 2 == 0){
+				console.log("not whites turn");
+				return 0;
+			}
+			
 			if(isWhitePiece(x,y) == 1){
 				return 0;
 			}
 			
-			if(x == deletedPieceX + 2 && y == deletedPieceY + 1){
+			if(x == selectedPieceX + 2 && y == selectedPieceY + 1){
 				return 1;
-			} else if ( x == deletedPieceX + 2 && y == deletedPieceY - 1){
+			} else if ( x == selectedPieceX + 2 && y == selectedPieceY - 1){
 				return 1;
-			} else if(x == deletedPieceX - 2 && y == deletedPieceY + 1){
+			} else if(x == selectedPieceX - 2 && y == selectedPieceY + 1){
 				return 1;
-			} else if(x == deletedPieceX - 2 && y == deletedPieceY - 1){
+			} else if(x == selectedPieceX - 2 && y == selectedPieceY - 1){
 				return 1;
-			} else if(x == deletedPieceX + 1 && y == deletedPieceY + 2){
+			} else if(x == selectedPieceX + 1 && y == selectedPieceY + 2){
 				return 1;
-			} else if(x == deletedPieceX + 1 && y == deletedPieceY - 2){
+			} else if(x == selectedPieceX + 1 && y == selectedPieceY - 2){
 				return 1;
-			} else if(x == deletedPieceX - 1 && y == deletedPieceY + 2){
+			} else if(x == selectedPieceX - 1 && y == selectedPieceY + 2){
 				return 1;
-			} else if(x == deletedPieceX - 1 && y == deletedPieceY - 2){
+			} else if(x == selectedPieceX - 1 && y == selectedPieceY - 2){
 				return 1;
 			} else {
 				return 0;
@@ -544,6 +559,12 @@
 			//declare variables that will be used 
 			//to make sure bishop does not go through pieces
 			
+			//return 0 if it is not whites turn
+			if(currentMove % 2 == 0){
+				console.log("not whites turn");
+				return 0;
+			}
+			
 			//make sure player doesn't take his own piece
 			if(isWhitePiece(x,y) == 1){
 				return 0;
@@ -551,21 +572,21 @@
 			
 			var changeInX;
 			var changeInY;
-			var xOnPath = deletedPieceX;
-			var yOnPath = deletedPieceY;
+			var xOnPath = selectedPieceX;
+			var yOnPath = selectedPieceY;
 			var result;
 			
-			if(x > deletedPieceX){
+			if(x > selectedPieceX){
 				changeInX = 1
 			}  else {
 				changeInX = -1
 			}
-			if(y > deletedPieceY){
+			if(y > selectedPieceY){
 				changeInY = 1
 			}  else {
 				changeInY = -1
 			}
-			if(Math.abs(x-deletedPieceX) == Math.abs(y-deletedPieceY)){
+			if(Math.abs(x-selectedPieceX) == Math.abs(y-selectedPieceY)){
 				result = 1;
 				while(xOnPath != x-changeInX && yOnPath != y-changeInY){
 					xOnPath += changeInX;
@@ -583,22 +604,27 @@
 			var changeInX = 0;
 			var changeInY = 0;
 			
+			//return 0 if it is not whites turn
+			if(currentMove % 2 == 0){
+				console.log("not whites turn");
+				return 0;
+			}
+			
 			//make sure player doesn't take his own piece
 			if(isWhitePiece(x,y) == 1){
-				console.log("tried to take a white piece");
 				return 0;
 			}
 			
 			//logic for when moving along y axis
-			if(x == deletedPieceX && y != deletedPieceY){
+			if(x == selectedPieceX && y != selectedPieceY){
 				
-				if (deletedPieceY < y){
+				if (selectedPieceY < y){
 					changeInY = 1;
 				} else {
 					changeInY = -1;
 				}
 				
-				for (var i = deletedPieceY+changeInY; i!= y; i+=changeInY){
+				for (var i = selectedPieceY+changeInY; i!= y; i+=changeInY){
 					if( boardArray[x][i] != 0){
 						return 0;
 					}
@@ -606,15 +632,15 @@
 			}
 			
 			//logic for when moving along x axis
-			if(x != deletedPieceX && y == deletedPieceY){
+			if(x != selectedPieceX && y == selectedPieceY){
 				
-				if (deletedPieceX < x){
+				if (selectedPieceX < x){
 					changeInX = 1;
 				} else {
 					changeInX = -1;
 				}
 				
-				for (var i = deletedPieceX + changeInX; i!= x; i+=changeInX){
+				for (var i = selectedPieceX + changeInX; i!= x; i+=changeInX){
 					if( boardArray[i][y] != 0){
 						return 0;
 					}
@@ -627,33 +653,39 @@
 		case 7: //this handles valid move logic for black pawns
 			//handles 2 square moves from starting position
 			
+			//return 0 if it is not blacks turn
+			if(currentMove % 2 == 1){
+				console.log("not blacks turn");
+				return 0;
+			}
+			
 			//make sure player doesn't take his own piece
 			if(isBlackPiece(x,y) == 1){
 				return 0;
 			}
 			
-			if(y-2 == 1 && x == deletedPieceX && boardArray[x][y] == 0 && boardArray[x][y-1] == 0){
+			if(y-2 == 1 && x == selectedPieceX && boardArray[x][y] == 0 && boardArray[x][y-1] == 0){
 				enPassantCaptureX = x;
 				enPassantCaptureY = y-1;
 				return 1;
 			}
 			
 			//handles 1 square moves forward
-			else if (y-1 == deletedPieceY && x == deletedPieceX && boardArray[x][y] == 0){
+			else if (y-1 == selectedPieceY && x == selectedPieceX && boardArray[x][y] == 0){
 				return 1;
 			}
 			
 			//handles capturing forward and to the left or right
-			else if (y - 1 == deletedPieceY && boardArray[x][y] != 0){
-				if(x == deletedPieceX + 1 || x == deletedPieceX-1){
+			else if (y - 1 == selectedPieceY && boardArray[x][y] != 0){
+				if(x == selectedPieceX + 1 || x == selectedPieceX-1){
 					return 1;
 				} else {
 					return 0;
 				}
 			}
 			//handles en passant capturing
-			else if (y - 1 == deletedPieceY && x == enPassantCaptureX && y == enPassantCaptureY){
-				if(x == deletedPieceX+1 || x == deletedPieceX -1){
+			else if (y - 1 == selectedPieceY && x == enPassantCaptureX && y == enPassantCaptureY){
+				if(x == selectedPieceX+1 || x == selectedPieceX -1){
 					boardArray[x][y-1] = 0;
 					return 1;
 				} else {
@@ -664,26 +696,32 @@
 			}
 		case 8: //handles valid move logic for white knights
 			
+			//return 0 if it is not blacks turn
+			if(currentMove % 2 == 1){
+				console.log("not blacks turn");
+				return 0;
+			}
+			
 			//make sure player doesn't take his own piece
 			if(isBlackPiece(x,y) == 1){
 				return 0;
 			}
 			
-			if(x == deletedPieceX + 2 && y == deletedPieceY + 1){
+			if(x == selectedPieceX + 2 && y == selectedPieceY + 1){
 				return 1;
-			} else if ( x == deletedPieceX + 2 && y == deletedPieceY - 1){
+			} else if ( x == selectedPieceX + 2 && y == selectedPieceY - 1){
 				return 1;
-			} else if(x == deletedPieceX - 2 && y == deletedPieceY + 1){
+			} else if(x == selectedPieceX - 2 && y == selectedPieceY + 1){
 				return 1;
-			} else if(x == deletedPieceX - 2 && y == deletedPieceY - 1){
+			} else if(x == selectedPieceX - 2 && y == selectedPieceY - 1){
 				return 1;
-			} else if(x == deletedPieceX + 1 && y == deletedPieceY + 2){
+			} else if(x == selectedPieceX + 1 && y == selectedPieceY + 2){
 				return 1;
-			} else if(x == deletedPieceX + 1 && y == deletedPieceY - 2){
+			} else if(x == selectedPieceX + 1 && y == selectedPieceY - 2){
 				return 1;
-			} else if(x == deletedPieceX - 1 && y == deletedPieceY + 2){
+			} else if(x == selectedPieceX - 1 && y == selectedPieceY + 2){
 				return 1;
-			} else if(x == deletedPieceX - 1 && y == deletedPieceY - 2){
+			} else if(x == selectedPieceX - 1 && y == selectedPieceY - 2){
 				return 1;
 			} else {
 				return 0;
@@ -692,6 +730,12 @@
 			//declare variables that will be used 
 			//to make sure bishop does not go through pieces
 			
+			//return 0 if it is not blacks turn
+			if(currentMove % 2 == 1){
+				console.log("not blacks turn");
+				return 0;
+			}
+			
 			//make sure player doesn't take his own piece
 			if(isBlackPiece(x,y) == 1){
 				return 0;
@@ -699,21 +743,21 @@
 			
 			var changeInX;
 			var changeInY;
-			var xOnPath = deletedPieceX;
-			var yOnPath = deletedPieceY;
+			var xOnPath = selectedPieceX;
+			var yOnPath = selectedPieceY;
 			var result;
 			
-			if(x > deletedPieceX){
+			if(x > selectedPieceX){
 				changeInX = 1
 			}  else {
 				changeInX = -1
 			}
-			if(y > deletedPieceY){
+			if(y > selectedPieceY){
 				changeInY = 1
 			}  else {
 				changeInY = -1
 			}
-			if(Math.abs(x-deletedPieceX) == Math.abs(y-deletedPieceY)){
+			if(Math.abs(x-selectedPieceX) == Math.abs(y-selectedPieceY)){
 				result = 1;
 				while(xOnPath != x-changeInX && yOnPath != y-changeInY){
 					xOnPath += changeInX;
@@ -731,6 +775,12 @@
 			var changeInX = 0;
 			var changeInY = 0;
 			
+			//return 0 if it is not blacks turn
+			if(currentMove % 2 == 1){
+				console.log("not blacks turn");
+				return 0;
+			}
+			
 			//make sure player doesn't take his own piece
 			if(isBlackPiece(x,y) == 1){
 				console.log("tried to take a black piece");
@@ -738,15 +788,15 @@
 			}
 			
 			//logic for when moving along y axis
-			if(x == deletedPieceX && y != deletedPieceY){
+			if(x == selectedPieceX && y != selectedPieceY){
 				
-				if (deletedPieceY < y){
+				if (selectedPieceY < y){
 					changeInY = 1;
 				} else {
 					changeInY = -1;
 				}
 				
-				for (var i = deletedPieceY+changeInY; i!= y; i+=changeInY){
+				for (var i = selectedPieceY+changeInY; i!= y; i+=changeInY){
 					if( boardArray[x][i] != 0){
 						return 0;
 					}
@@ -754,15 +804,15 @@
 			}
 			
 			//logic for when moving along x axis
-			if(x != deletedPieceX && y == deletedPieceY){
+			if(x != selectedPieceX && y == selectedPieceY){
 				
-				if (deletedPieceX < x){
+				if (selectedPieceX < x){
 					changeInX = 1;
 				} else {
 					changeInX = -1;
 				}
 				
-				for (var i = deletedPieceX + changeInX; i!= x; i+=changeInX){
+				for (var i = selectedPieceX + changeInX; i!= x; i+=changeInX){
 					if( boardArray[i][y] != 0){
 						return 0;
 					}
